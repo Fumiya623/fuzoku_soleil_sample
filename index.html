@@ -240,8 +240,18 @@
   <!-- 送信完了画面 -->
   <div id="success-view" class="card success-card" style="display: none;">
     <h2 style="color: var(--accent-color); margin-bottom: 12px;">✨ 占いが完了しました！</h2>
-    <p class="description">結果がスプレッドシートに保存されました。<br>お客さんにパワーストーンとQRコードを渡してください。</p>
-    <button onclick="location.reload()" class="btn-submit" style="margin-top: 24px;">次の人を占う</button>
+    <p class="description">結果がスプレッドシートに保存されました。</p>
+
+    <!-- 渡すQRコード番号の emphasized 表示 -->
+    <div style="background: rgba(0, 0, 0, 0.3); border: 2px dashed var(--accent-color); border-radius: 12px; padding: 16px; margin: 16px 0;">
+      <div style="font-size: 0.9rem; opacity: 0.8;">お客さんに渡す紙の番号</div>
+      <div id="submitted-qr-index" style="font-size: 2.2rem; font-weight: bold; color: var(--accent-color); letter-spacing: 2px; margin: 4px 0;">
+        ----
+      </div>
+      <div style="font-size: 0.85rem;">上記番号の<b>「QRコードの紙」</b>と<b>「パワーストーン」</b>をお渡しください。</div>
+    </div>
+
+    <button type="button" id="next-person-btn" class="btn-submit" style="margin-top: 12px;">次の人を占う</button>
   </div>
 </div>
 
@@ -318,10 +328,12 @@
     formView.style.display = 'block';
   }
 
+  // フォーム送信処理
   document.getElementById('fortune-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const qrIndex = document.getElementById('qr-index').value;
+    const qrIndexInput = document.getElementById('qr-index');
+    const qrIndex = qrIndexInput.value;
     const choices = document.querySelectorAll('#questions-container .card');
     const answers = [];
 
@@ -357,6 +369,9 @@
 
       if (!json.success) throw new Error(json.message || "保存に失敗しました");
 
+      // 1. 送信完了画面にQRコード番号を反映
+      document.getElementById('submitted-qr-index').textContent = `No. ${qrIndex}`;
+
       loadingView.style.display = 'none';
       successView.style.display = 'block';
     } catch (err) {
@@ -364,6 +379,19 @@
       loadingView.style.display = 'none';
       formView.style.display = 'block';
     }
+  });
+
+  // 2. 「次の人を占う」ボタン押下時：前回の選択値をクリアして高速再開
+  document.getElementById('next-person-btn').addEventListener('click', () => {
+    // フォーム要素全体をリセット（ラジオボタンとQRコード番号の入力をクリア）
+    document.getElementById('fortune-form').reset();
+
+    // 表示切り替え（GASへの再通信は行わず、質問フォームを表示）
+    successView.style.display = 'none';
+    formView.style.display = 'block';
+
+    // 画面一番上へスクロール
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 </script>
 
