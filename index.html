@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>占い入力フォーム</title>
+  <meta name="description" content="金沢大学附属高校第79回開校記念祭における有志模擬店「Soleil」で使用する占いプログラムの回答入力ページ">
+  <meta name="author" content="金沢大学附属高校78回生有志">
   <style>
     :root {
       --bg-color: #0f172a;
@@ -373,11 +375,11 @@
       const response = await fetch(`${GAS_URL}?action=getQuestions&booth=${booth}`);
       const json = await response.json();
 
-      if (!json.success) throw new Error(json.message || "質問データの取得に失敗しました");
+      if (!json.success) throw new Error(json.message || "質問データの取得に失敗しました。");
 
       renderForm(json.data);
     } catch (err) {
-      alert("エラー: " + err.message);
+      alert(err.message);
     } finally {
       loadingView.style.display = 'none';
     }
@@ -572,14 +574,14 @@
       });
       const json = await response.json();
 
-      if (!json.success) throw new Error(json.message || "保存に失敗しました");
+      if (!json.success) throw new Error(json.message || "保存に失敗しました。");
 
       document.getElementById('submitted-qr-index').textContent = `No. ${qrIndex}`;
 
       loadingView.style.display = 'none';
       successView.style.display = 'block';
     } catch (err) {
-      alert("送信エラー: " + err.message);
+      alert(err.message);
       loadingView.style.display = 'none';
       formView.style.display = 'block';
     }
