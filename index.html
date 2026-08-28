@@ -17,15 +17,6 @@
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    [data-theme="snack"] {
-      --bg-color: #120018;
-      --card-bg: #22082e;
-      --text-color: #fce7f3;
-      --accent-color: #ec4899;
-      --accent-glow: rgba(236, 72, 153, 0.4);
-      --border-color: #4c1d95;
-    }
-
     [data-theme="gal"] {
       --bg-color: #ffe1ed;
       --card-bg: #fff0f6;
@@ -35,7 +26,16 @@
       --border-color: #fbcfe8;
     }
 
-    [data-theme="scientist"] {
+    [data-theme="snack"] {
+      --bg-color: #120018;
+      --card-bg: #22082e;
+      --text-color: #fce7f3;
+      --accent-color: #ec4899;
+      --accent-glow: rgba(236, 72, 153, 0.4);
+      --border-color: #4c1d95;
+    }
+
+    [data-theme="element"] {
       --bg-color: #051014;
       --card-bg: #0b1d24;
       --text-color: #e0f2fe;
@@ -288,13 +288,13 @@
   <div id="portal-view" style="display: none;">
     <div class="header-card">
       <h1>🔮 占いブース入力選択</h1>
-      <p class="description" style="text-align: center;">開校記念祭 占い館システムへようこそ。<br>使用するブースを選択してください。</p>
+      <p class="description" style="text-align: center;">こちらは占い師向けシステムです。<br>模擬店スタッフは使用するブースを選択してください。</p>
     </div>
     <div class="portal-grid">
-      <a href="?booth=snack" class="portal-link" style="border-color: #ec4899;">① スナックママの人生の転機占い</a>
-      <a href="?booth=gal" class="portal-link" style="border-color: #ff2a85;">② ギャルの恋愛占い</a>
-      <a href="?booth=scientist" class="portal-link" style="border-color: #10b981;">③ マッドサイエンティストの元素占い</a>
-      <a href="?booth=alien" class="portal-link" style="border-color: #6366f1;">④ 宇宙人の未知の才能占い</a>
+      <a href="?booth=gal" class="portal-link" style="border-color: #ff2a85;">ギャルの恋愛占い</a>
+      <a href="?booth=snack" class="portal-link" style="border-color: #ec4899;">スナックママの人生の転機占い</a>
+      <a href="?booth=element" class="portal-link" style="border-color: #10b981;">マッドサイエンティストの元素占い</a>
+      <a href="?booth=alien" class="portal-link" style="border-color: #6366f1;">宇宙人の未知の才能占い</a>
     </div>
   </div>
 
@@ -347,26 +347,26 @@
 </div>
 
 <script>
-  // ★ ここにご自身のGAS Web App URLを入力してください
+  // GAS Web App URL
   const GAS_URL = "https://script.google.com/macros/s/AKfycbw0CFCs9TFZH2EkK7TbYMT6GUL_pPHqEhqcNoA1LK1z3SyG99Z7mOcyTj5MD203ZnIS/exec";
 
   const urlParams = new URLSearchParams(window.location.search);
-  const booth = urlParams.get('booth');
+  const booth = urlParams.get("booth");
 
-  const portalView = document.getElementById('portal-view');
-  const formView = document.getElementById('form-view');
-  const loadingView = document.getElementById('loading-view');
-  const successView = document.getElementById('success-view');
+  const portalView = document.getElementById("portal-view");
+  const formView = document.getElementById("form-view");
+  const loadingView = document.getElementById("loading-view");
+  const successView = document.getElementById("success-view");
 
   let currentStep = 0;
   let totalSteps = 0;
   let questionCount = 0;
 
   if (!booth) {
-    loadingView.style.display = 'none';
-    portalView.style.display = 'block';
+    loadingView.style.display = "none";
+    portalView.style.display = "block";
   } else {
-    document.documentElement.setAttribute('data-theme', booth);
+    document.documentElement.setAttribute("data-theme", booth);
     loadQuestions();
   }
 
@@ -381,15 +381,15 @@
     } catch (err) {
       alert(err.message);
     } finally {
-      loadingView.style.display = 'none';
+      loadingView.style.display = "none";
     }
   }
 
   function renderForm(data) {
-    document.getElementById('booth-title').textContent = data.concept.title;
+    document.getElementById("booth-title").textContent = data.concept.title;
 
-    const container = document.getElementById('questions-container');
-    container.innerHTML = '';
+    const container = document.getElementById("questions-container");
+    container.innerHTML = "";
 
     const questions = data.questions;
     questionCount = questions.length;
@@ -397,11 +397,9 @@
     // ステップ総数 = ブース説明(1) + 質問数(questionCount) + QR入力(1)
     totalSteps = 1 + questionCount + 1;
 
-    // -------------------------------------------------------------
     // Step 0: ブースの説明カード（最初に表示）
-    // -------------------------------------------------------------
-    const conceptCard = document.createElement('div');
-    conceptCard.className = 'card question-card active';
+    const conceptCard = document.createElement("div");
+    conceptCard.className = "card question-card active";
     conceptCard.dataset.step = 0;
     conceptCard.innerHTML = `
       <div class="q-title" style="text-align: center; margin-bottom: 12px; color: var(--accent-color);">
@@ -411,34 +409,32 @@
     `;
     container.appendChild(conceptCard);
 
-    // -------------------------------------------------------------
     // Step 1 〜 M: 各質問カード
-    // -------------------------------------------------------------
     questions.forEach((q, qIndex) => {
-      const card = document.createElement('div');
-      card.className = 'card question-card';
+      const card = document.createElement("div");
+      card.className = "card question-card";
       card.dataset.step = qIndex + 1; // Step 1 から開始
 
-      const badge = document.createElement('span');
-      badge.className = `q-badge ${q.secret ? 'secret' : 'public'}`;
-      badge.textContent = q.secret ? '占い師が入力' : 'お客さんが回答';
+      const badge = document.createElement("span");
+      badge.className = `q-badge ${q.secret ? "secret" : "public"}`;
+      badge.textContent = q.secret ? "占い師が入力" : "お客さんが回答";
 
-      const title = document.createElement('div');
-      title.className = 'q-title';
+      const title = document.createElement("div");
+      title.className = "q-title";
       title.textContent = `Q${q.index || qIndex + 1}. ${q.description}`;
 
       card.appendChild(badge);
       card.appendChild(title);
 
       const isGrid = q.layout === "grid" || q.choices.some(c => c.imageUrl);
-      const choicesWrapper = document.createElement('div');
-      choicesWrapper.className = `choices-container ${isGrid ? 'grid' : 'list'}`;
+      const choicesWrapper = document.createElement("div");
+      choicesWrapper.className = `choices-container ${isGrid ? "grid" : "list"}`;
 
       q.choices.forEach(c => {
-        const option = document.createElement('label');
-        option.className = 'choice-option';
+        const option = document.createElement("label");
+        option.className = "choice-option";
         
-        let imgHtml = '';
+        let imgHtml = "";
         if (c.imageUrl) {
           imgHtml = `<img src="${c.imageUrl}" alt="${c.description}" class="choice-image">`;
         }
@@ -455,11 +451,9 @@
       container.appendChild(card);
     });
 
-    // -------------------------------------------------------------
     // Step M + 1: 最終ステップ（QRコード番号入力）
-    // -------------------------------------------------------------
-    const qrCard = document.createElement('div');
-    qrCard.className = 'card question-card';
+    const qrCard = document.createElement("div");
+    qrCard.className = "card question-card";
     qrCard.dataset.step = 1 + questionCount;
     qrCard.innerHTML = `
       <label for="qr-index" class="q-title" style="display: block; text-align: center;">
@@ -472,50 +466,50 @@
     `;
     container.appendChild(qrCard);
 
-    formView.style.display = 'block';
+    formView.style.display = "block";
     updateStepDisplay();
   }
 
   // ステップ表示およびナビゲーションボタンの切り替え
   function updateStepDisplay() {
-    const cards = document.querySelectorAll('.question-card');
+    const cards = document.querySelectorAll(".question-card");
     cards.forEach((card, idx) => {
-      card.classList.toggle('active', idx === currentStep);
+      card.classList.toggle("active", idx === currentStep);
     });
 
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const submitBtn = document.getElementById('submit-btn');
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const submitBtn = document.getElementById("submit-btn");
 
     // 1. 「前の項目へ」ボタンの制御
-    prevBtn.style.display = currentStep === 0 ? 'none' : 'block';
+    prevBtn.style.display = currentStep === 0 ? "none" : "block";
 
     // 2. 「次へ」/「送信」ボタンのテキストと表示制御
     if (currentStep === 0) {
       // 最初のブース説明画面
-      nextBtn.style.display = 'block';
-      nextBtn.textContent = '✨ 占いを始める';
-      submitBtn.style.display = 'none';
+      nextBtn.style.display = "block";
+      nextBtn.textContent = "✨ 占いを始める";
+      submitBtn.style.display = "none";
     } else if (currentStep === totalSteps - 1) {
       // 最後のQRコード入力画面
-      nextBtn.style.display = 'none';
-      submitBtn.style.display = 'block';
+      nextBtn.style.display = "none";
+      submitBtn.style.display = "block";
     } else {
       // 質問画面
-      nextBtn.style.display = 'block';
-      nextBtn.textContent = '次の項目へ ▶';
-      submitBtn.style.display = 'none';
+      nextBtn.style.display = "block";
+      nextBtn.textContent = "次の項目へ ▶";
+      submitBtn.style.display = "none";
     }
 
     // 3. プログレスバーの更新
     const progressPercent = (currentStep / (totalSteps - 1)) * 100;
-    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+    document.getElementById("progress-bar").style.width = `${progressPercent}%`;
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // 「次へ」/「占いを始める」ボタン押下時
-  document.getElementById('next-btn').addEventListener('click', () => {
+  document.getElementById("next-btn").addEventListener("click", () => {
     // 質問ステップ（Step 1 〜 Step M）にいる場合のみ回答チェック
     if (currentStep >= 1 && currentStep <= questionCount) {
       const qIndex = currentStep - 1; // 質問の0インデックスに合わせる
@@ -530,7 +524,7 @@
   });
 
   // 「前の項目へ」ボタン押下時
-  document.getElementById('prev-btn').addEventListener('click', () => {
+  document.getElementById("prev-btn").addEventListener("click", () => {
     if (currentStep > 0) {
       currentStep--;
       updateStepDisplay();
@@ -538,10 +532,10 @@
   });
 
   // フォーム送信処理
-  document.getElementById('fortune-form').addEventListener('submit', async (e) => {
+  document.getElementById("fortune-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     
-    const qrIndexInput = document.getElementById('qr-index');
+    const qrIndexInput = document.getElementById("qr-index");
     const qrIndex = qrIndexInput.value;
 
     // 各質問の回答を取得
@@ -562,39 +556,39 @@
       }
     };
 
-    formView.style.display = 'none';
-    loadingView.style.display = 'block';
-    document.getElementById('loading-msg').textContent = "占い結果を計算・保存しています...";
+    formView.style.display = "none";
+    loadingView.style.display = "block";
+    document.getElementById("loading-msg").textContent = "占い結果を計算・保存しています...";
 
     try {
       const response = await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       });
       const json = await response.json();
 
       if (!json.success) throw new Error(json.message || "保存に失敗しました。");
 
-      document.getElementById('submitted-qr-index').textContent = `No. ${qrIndex}`;
+      document.getElementById("submitted-qr-index").textContent = `No. ${qrIndex}`;
 
-      loadingView.style.display = 'none';
-      successView.style.display = 'block';
+      loadingView.style.display = "none";
+      successView.style.display = "block";
     } catch (err) {
       alert(err.message);
-      loadingView.style.display = 'none';
-      formView.style.display = 'block';
+      loadingView.style.display = "none";
+      formView.style.display = "block";
     }
   });
 
   // 「次の人を占う」ボタン
-  document.getElementById('next-person-btn').addEventListener('click', () => {
-    document.getElementById('fortune-form').reset();
+  document.getElementById("next-person-btn").addEventListener("click", () => {
+    document.getElementById("fortune-form").reset();
     currentStep = 0;
     updateStepDisplay();
 
-    successView.style.display = 'none';
-    formView.style.display = 'block';
+    successView.style.display = "none";
+    formView.style.display = "block";
   });
 </script>
 
